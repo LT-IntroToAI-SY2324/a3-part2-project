@@ -53,4 +53,3 @@ def neighbor_by_school(matches: List[str]) -> List[str]:
         if school == matches:
             places.append(get_neighbor(food))
     return places
-print(neighbor_by_school("lane tech"))
