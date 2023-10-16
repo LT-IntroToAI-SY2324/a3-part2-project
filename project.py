@@ -71,6 +71,56 @@ def school_by_neighbor(matches: List[str]) -> List[str]:
             places.append(get_school(food))
     return places
 
+def neighbor_by_food(matches: List[str]) -> List[str]:
+    """Finds neighborhood(s) in food choice
+
+    Args:
+        matches - a list of 1 string, just the neighborhood.
+
+    Returns:
+        school(s) that's in neighborhood 
+    """
+    places = []
+    for food in mylist_db:
+        school = get_food(food)
+        for food2 in school:
+            if food2 == matches[0]:
+                places.append(get_neighbor(food))
+    return places
+
+def school_by_food(matches: List[str]) -> List[str]:
+    """Finds school(s) in food choice
+
+    Args:
+        matches - a list of 1 string, just the neighborhood.
+
+    Returns:
+        school(s) that's in neighborhood 
+    """
+    places = []
+    for food in mylist_db:
+        school = get_food(food)
+        for food2 in school:
+            if food2 == matches[0]:
+                places.append(get_school(food))
+    return places
+
+def food_by_neighbor(matches: List[str]) -> List[str]:
+    """Finds neighborhood(s) in food choice
+
+    Args:
+        matches - a list of 1 string, just the neighborhood.
+
+    Returns:
+        school(s) that's in neighborhood 
+    """
+    places = []
+    for food in mylist_db:
+        school = get_neighbor(food)
+        if school == matches[0]:
+            for food2 in get_food(food):
+                places.append(food2)
+    return places
 
 def bye_action(dummy: List[str]) -> None:
     raise KeyboardInterrupt
@@ -80,6 +130,9 @@ pa_list: List[Tuple[List[str], Callable[[List[str]], List[Any]]]] = [
     (str.split("which neighborhood is % located"), neighbor_by_school),
     (str.split("which schools are in %"), school_by_neighbor),
     (str.split("what restaurants are in %"), food_by_school),
+    (str.split("what schools have % nearby"), school_by_food),
+    (str.split("what neigborhoods have % nearby"), neighbor_by_food),
+    (str.split("what food is near %"), food_by_neighbor),
     (["bye"], bye_action),
 ]
 def search_pa_list(src: List[str]) -> List[str]:
@@ -100,12 +153,18 @@ def search_pa_list(src: List[str]) -> List[str]:
         check = match(pattern[0],src)
         if check != None:
             for source in src:
-                if source == "neigborhood":
+                if source == "neighborhood":
                     ans = neighbor_by_school(check)
                 elif source == "schools":
                     ans = school_by_neighbor(check)
                 elif source == "restaurants":
                     ans = food_by_school(check)
+                elif source == "schools":
+                    ans = school_by_food(check)
+                elif source == "neighborhoods":
+                    ans = neighbor_by_food(check)
+                elif source == "food":
+                    ans = food_by_neighbor(check)
             if ans == []:
                 action.append("No answers")
                 return action
@@ -149,5 +208,23 @@ if __name__ == "__main__":
     assert sorted(school_by_neighbor(["west side"])) == sorted(
         ["whitney young", "cristo rey"]
     ), "failed 2nd school_by_neighbor test"
+    assert sorted(neighbor_by_food(["chop suey"])) == sorted(
+        ["roscoe"]
+    ), "failed neighbor_by_food test"
+    assert sorted(school_by_food(["starbucks"])) == sorted(
+        ["von steuben", "lakeview", "de la salle", "jones"]
+    ), "failed school_by_food test"
+    assert sorted(food_by_neighbor(["printer's row"])) == sorted([
+            "devil dawgs on state",
+            "harold's chicken shack",
+            "starbucks",
+            "gong cha",
+        ]), "failed 1st food_by_neighbor test"
+    assert sorted(food_by_neighbor(["west side"])) == sorted(
+        ["cafe l'appetito","froth", "la lagartija taqueria","xurro",
+            "carniceria maribel",
+            "mole village",
+            "subway",
+            "tj's"]), "failed 2nd food_by_neighbor test"
     
     print("All tests passed")
